@@ -14,7 +14,7 @@ class CreateWifiLocations < ActiveRecord::Migration
       t.integer :source_id
       t.string :borough
       t.string :remarks
-      t.string :type
+      t.string :access
       t.float :longitude # ['geometry']['coordinates'][0]
       t.float :latitude # ['geometry']['coordinates'][1]
     end
