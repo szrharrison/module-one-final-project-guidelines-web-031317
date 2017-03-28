@@ -24,7 +24,3 @@ wifi_hash["features"].each do |feature|
   }
   WifiLocation.create(args)
 end
-
-# binding.pry
-#
-# puts hooray!
