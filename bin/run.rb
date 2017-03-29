@@ -9,19 +9,11 @@ def run
     when 'help'
       WifiRunner.help
     when 'near me'
-      session.set_coords_based_on_ip
-      session.find_closest_wifi
-    when 'list hotspots'
-      WifiRunner.hotspot_areas.each do |area|
-        puts area
-      end
-    when 'by loc'
-      session.coords_prompt
-      session.find_closest_wifi
+      session.near_me
+    when 'by coordinates'
+      session.by_coordinates
     when 'near address'
-      address = session.prompt_address
-      session.address_to_coords(address)
-      session.find_closest_wifi
+      session.near_address
     end
   end
   puts 'Thank you for using WiFinder. Goodbye.'
