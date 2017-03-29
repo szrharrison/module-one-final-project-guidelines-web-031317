@@ -14,15 +14,13 @@ class Adapters::NYCOpenData
   private
 
   def self.wifi_location_data
-    response = client.get( "jd4g-ks2z" )
+    response = client.get( "jd4g-ks2z", :$limit => 5000 )
   end
 
   def self.get_wifi_location( data )
-    location = {
-      longitude:      data["the_geom"]["coordinates"][0],
-      latitude:       data["the_geom"]["coordinates"][1]
-    }
     attributes = {
+      longitude:      data["the_geom"]["coordinates"][0],
+      latitude:       data["the_geom"]["coordinates"][1],
       x:              data["x"],
       y:              data["y"],
       city:           data["city"],
@@ -38,6 +36,6 @@ class Adapters::NYCOpenData
       remarks:        data["remarks"],
       access:         data["type"],
     }
-    WifiLocation.create_with(attributes).find_or_create_by(location)
+    WifiLocation.create_with(attributes).find_or_create_by(object_id: attributes[:object_id])
   end
 end
