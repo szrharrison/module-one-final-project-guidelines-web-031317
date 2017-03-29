@@ -1,22 +1,21 @@
 require_relative '../config/environment'
 
 def run
-  greeting
-  user = start_user_session
-  welcome_user(user)
-  input = ''
-  while input != 'quit'
-    input = prompt_user
-    case input
+  WifiRunner.greeting
+  session = WifiRunner.new
+  while session.input != 'quit'
+    session.prompt_user
+    case session.input
     when 'help'
-      help
+      WifiRunner.help
     when 'list hotspots'
-      hotspot_areas.each do |area|
+      WifiRunner.hotspot_areas.each do |area|
         puts area
       end
     when 'wifi by loc'
-      loc = loc_prompt
-      loc_wifi_finder(loc)
+      session.coords_prompt
+      session.coords_wifi_finder
+      session.display_wifi_distance( session.closest_wifi )
     end
   end
   puts 'Thank you for using WiFinder. Goodbye.'
