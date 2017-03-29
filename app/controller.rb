@@ -1,11 +1,12 @@
 class WifiRunner
-  attr_accessor :latitude, :longitude, :input, :closest_wifi
+  attr_accessor :latitude, :longitude, :input, :closest_wifi, :ip
   attr_reader :user
 
   def initialize
     puts "Please enter your name:"
     input = gets.strip
     @user = User.find_or_create_by(name: input)
+    user.find_user_ip
     puts "Welcome #{self.user.name}!"
   end
 
@@ -14,6 +15,7 @@ class WifiRunner
   end
 
   def self.help
+    puts 'wifi near me    - nearest wifi to my current location'
     puts 'wifi by loc     - nearest wifi by location'
     puts 'list hotspots   - lists all hotspots'
     puts 'quit            - exit the program'
@@ -57,4 +59,12 @@ class WifiRunner
   def display_wifi_distance( name:, distance: )
     puts "#{name} located at #{self.class.hotspots.find_by(name: name).location}, is #{distance.round(3)} miles away"
   end
+
+  def set_coords_based_on_ip
+    self.latitude = self.user.lat
+    self.longitude = self.user.lon
+  end
+
+
+
 end
