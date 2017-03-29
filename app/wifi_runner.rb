@@ -28,19 +28,19 @@ class WifiRunner
   end
 
   def by_coordinates
-    Helpers::Coordinates.coords_prompt(self)
-    Helpers::Coordinates.find_closest_wifi(self)
+    Runner::Coordinates.coords_prompt(self)
+    Runner::Coordinates.find_closest_wifi(self)
   end
 
   def near_address
-    address = Helpers::StreetAddress.prompt_address
-    Helpers::StreetAddress.address_to_coords(address, self)
-    Helpers::Coordinates.find_closest_wifi(self)
+    address = Runner::StreetAddress.prompt_address
+    Runner::StreetAddress.address_to_coords(address, self)
+    Runner::Coordinates.find_closest_wifi(self)
   end
 
   def near_me
-    Helpers::IpAddress.set_coords_based_on_ip(self)
-    Helpers::Coordinates.find_closest_wifi(self)
+    Runner::IpAddress.set_coords_based_on_ip(self)
+    Runner::Coordinates.find_closest_wifi(self)
   end
 
 end

@@ -1,4 +1,4 @@
-module Helpers
+module Runner
 
   class IpAddress
     def self.set_coords_based_on_ip(wifi_runner)
