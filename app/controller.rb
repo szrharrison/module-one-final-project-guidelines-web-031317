@@ -1,5 +1,5 @@
 class WifiRunner
-  attr_accessor :latitude, :longitude, :input, :closest_wifi, :ip
+  attr_accessor :latitude, :longitude, :input, :closest_wifi, :search_results
   attr_reader :user
 
   def initialize
@@ -16,10 +16,11 @@ class WifiRunner
   end
 
   def self.help
-    puts 'wifi near me    - nearest wifi to my current location'
-    puts 'wifi by loc     - nearest wifi by location'
-    puts 'list hotspots   - lists all hotspots'
-    puts 'quit            - exit the program'
+    puts 'near me        - nearest wifi to my current location'
+    puts 'near address   - nearest wifi to a given address'
+    puts 'by loc         - nearest wifi by location'
+    puts 'list hotspots  - lists all hotspots'
+    puts 'quit           - exit the program'
   end
 
   def self.hotspots
@@ -35,6 +36,11 @@ class WifiRunner
     locations.uniq.select do |name|
       !( name =~ /-..-/ || name =~ /\A\d+\Z/ ) && name
     end.sort
+  end
+
+  def search_google(address)
+    Geocoder::Query.new(address).lookup
+    self.search_results = Geocoder::Lookup::Google.new.search(address)
   end
 
   def prompt_user
@@ -61,11 +67,25 @@ class WifiRunner
     puts "#{name} located at #{self.class.hotspots.find_by(name: name).location}, is #{distance.round(3)} miles away"
   end
 
+  def find_closest_wifi
+    self.coords_wifi_finder
+    self.display_wifi_distance( self.closest_wifi )
+  end
+
   def set_coords_based_on_ip
     self.latitude = self.user.lat
     self.longitude = self.user.lon
   end
 
+  def prompt_address
+    puts 'please enter an address'
+    gets.strip
+  end
 
+  def address_to_coords(address)
+    location = self.search_google(address)[0].data["geometry"]["location"]
+    self.longitude = location["lng"]
+    self.latitude = location["lat"]
+  end
 
 end
