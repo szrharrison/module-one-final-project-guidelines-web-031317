@@ -5,8 +5,9 @@ class WifiRunner
   def initialize
     puts "Please enter your name:"
     input = gets.strip
-    @user = User.find_or_create_by(name: input)
-    user.find_user_ip
+    @user = User.find_or_initialize_by(name: input)
+    self.user.ip_address = `dig +short myip.opendns.com @resolver1.opendns.com`.chomp
+    self.user.save
     puts "Welcome #{self.user.name}!"
   end
 
