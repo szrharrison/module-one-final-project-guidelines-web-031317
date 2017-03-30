@@ -6,7 +6,7 @@ class WifiRunner
     puts "Please enter your name:"
     input = gets.strip
     @user = User.find_or_initialize_by(name: input)
-    self.user.ip_address = `dig +short myip.opendns.com @resolver1.opendns.com`.chomp
+    self.user.ip_address = `dig +short myip opendns com @resolver1 opendns com`.chomp
     self.user.save
     puts "Welcome #{self.user.name}!"
     Runner::IpAddress.new(self).set_coords_based_on_ip
@@ -16,6 +16,14 @@ class WifiRunner
   end
 
   def self.greeting
+    i = 1
+    while i < 70
+      file = File.open("ascii_animation/#{i}.rb")
+      file.read
+      print "\033[2J"
+      sleep(0.03)
+      i += 1
+    end
     puts 'Welcome to WiFinder'
   end
 
