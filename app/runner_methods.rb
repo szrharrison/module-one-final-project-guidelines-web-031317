@@ -43,7 +43,7 @@ module Runner
     end
 
     def self.display_wifi_distance( name:, distance:, id: )
-      hotspot = HotspotData.hotspots.find_by(name: name)
+      hotspot = HotspotData.hotspots.find(id)
       puts "#{name} located at #{hotspot.location.downcase.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }}, is #{distance.round(3)} miles away. When you arrive, you will see it in your list of available connections as '#{hotspot.ssid}'."
     end
 
@@ -67,6 +67,12 @@ module Runner
   end
 
   class Favorites
+    def self.favorite(wifi_runner)
+      {
+        user_id: wifi_runner.user.id,
+        wifi_location_id: wifi_runner.closest_wifi[:id]
+      }
+    end
 
     def self.add_to_favorites(wifi_runner)
       puts "Would you like to add this wifi location to your Favorites? (y/n)"
@@ -84,7 +90,27 @@ module Runner
     end
 
     def self.add_favorites(wifi_runner)
-      Fav.find_or_create_by(user_id: wifi_runner.user.id, wifi_location_id: WifiLocation.find(wifi_runner.closest_wifi[:id]))
+      Fav.find_or_create_by( favorite(wifi_runner) )
+    end
+
+    def self.favorite?(wifi_runner)
+      !Fav.find_by( favorite(wifi_runner) )
+    end
+
+    def self.display_favorites(wifi_runner)
+      favorites = wifi_runner.user.favs.map do |fav|
+        location = WifiLocation.find(fav.wifi_location_id)
+        fav_wifi_info = {
+          name: location.name,
+          distance: Geocoder::Calculations.distance_between( [wifi_runner.latitude, wifi_runner.longitude], [location.latitude, location.longitude] ),
+          id: location.id
+        }
+      end
+      favorites = favorites.sort_by {|fav| fav[:distance] }
+      favorites.each_with_index do |fav, i|
+        print "#{i + 1}. "
+        Runner::Coordinates.display_wifi_distance(fav)
+      end
     end
   end
 

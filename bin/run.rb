@@ -14,6 +14,8 @@ def run
       session.by_coordinates
     when 'near address'
       session.near_address
+    when 'my favorites'
+      session.my_favorites
     end
   end
   puts 'Thank you for using WiFinder. Goodbye.'
