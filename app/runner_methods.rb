@@ -63,9 +63,9 @@ module Runner
       wifi_runner.closest_wifi = { name: closest_wifi[0], distance: closest_wifi[1][:distance], id: closest_wifi[1][:id] }
     end
 
-    def self.display_wifi_distance( name:, distance:, id: )
+    def self.display_wifi_distance( name:, distance:, id:, favorite_id: 0)
       hotspot = HotspotData.hotspots.find(id)
-      puts "#{name} located at #{hotspot.location.downcase.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }}, is #{distance.round(3)} miles away. When you arrive, you will see it in your list of available connections as '#{hotspot.ssid}'."
+      puts "#{name} is located at #{hotspot.location.downcase.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }}, is #{distance.round(3)} miles away. When you arrive, you will see it in your list of available connections as '#{hotspot.ssid}'."
     end
 
     def find_closest_wifi
@@ -88,7 +88,7 @@ module Runner
   end
 
   class Favorites
-
+    attr_accessor :favorites
     attr_reader :user, :wifi_runner
 
     def initialize(wifi_runner)
@@ -127,24 +127,27 @@ module Runner
     end
 
     def display_favorites
-      favorites = User.find(user.id).favs.map do |fav|
+      self.favorites = User.find(user.id).favs.map do |fav|
         location = WifiLocation.find(fav.wifi_location_id)
         fav_wifi_info = {
           name: location.name,
           distance: Geocoder::Calculations.distance_between( [wifi_runner.latitude, wifi_runner.longitude], [location.latitude, location.longitude] ),
-          id: location.id
+          id: location.id,
+          favorite_id: fav.id
         }
       end
-      favorites = favorites.sort_by {|fav| fav[:distance] }
+      self.favorites = favorites.sort_by {|fav| fav[:distance] }
       favorites.each_with_index do |fav, i|
         print "#{i + 1}. "
         Runner::Coordinates.display_wifi_distance(fav)
       end
     end
 
-    def delete_at(wifi_runner)
+    def delete_at
       puts "Select favorite to delete by entering its corresponding number."
-
+      fav_to_delete = gets.chomp
+      id_to_delete = favorites[fav_to_delete.to_i - 1][:favorite_id]
+      Fav.find(id_to_delete).destroy
     end
 
   end
