@@ -43,7 +43,8 @@ module Runner
     end
 
     def self.display_wifi_distance( name:, distance: )
-      puts "#{name} located at #{HotspotData.hotspots.find_by(name: name).location}, is #{distance.round(3)} miles away"
+      hotspot = HotspotData.hotspots.find_by(name: name)
+      puts "#{name} located at #{hotspot.location.downcase.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }}, is #{distance.round(3)} miles away. When you arrive, you will see it in your list of available connections as '#{hotspot.ssid}'."
     end
 
     def self.find_closest_wifi(wifi_runner)
