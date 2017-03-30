@@ -1,39 +1,60 @@
 module Runner
 
   class IpAddress
-    def self.set_coords_based_on_ip(wifi_runner)
-      wifi_runner.latitude = wifi_runner.user.lat
-      wifi_runner.longitude = wifi_runner.user.lon
+    attr_reader :user, :wifi_runner
+
+    def initialize(wifi_runner)
+      @wifi_runner = wifi_runner
+      @user = wifi_runner.user
+    end
+
+    def set_coords_based_on_ip
+      wifi_runner.latitude = user.lat
+      wifi_runner.longitude = user.lon
     end
   end
 
   class StreetAddress
+    attr_reader :user, :wifi_runner
 
-    def self.prompt_address
+    def initialize(wifi_runner)
+      @wifi_runner = wifi_runner
+      @user = wifi_runner.user
+    end
+
+    def prompt_address
       puts 'please enter an address'
       gets.strip
     end
 
-    def self.search_google(address, wifi_runner)
+    def search_google(address)
       Geocoder::Query.new(address).lookup
       wifi_runner.search_results = Geocoder::Lookup::Google.new.search(address)
     end
 
-    def self.address_to_coords(address, wifi_runner)
-      location = self.search_google(address, wifi_runner)[0].data["geometry"]["location"]
+    def address_to_coords(address)
+      location = search_google(address)[0].data["geometry"]["location"]
       wifi_runner.longitude = location["lng"]
       wifi_runner.latitude = location["lat"]
     end
   end
 
   class Coordinates
-    def self.coords_prompt(wifi_runner)
+
+    attr_reader :user, :wifi_runner
+
+    def initialize(wifi_runner)
+      @wifi_runner = wifi_runner
+      @user = wifi_runner.user
+    end
+
+    def coords_prompt
       puts "Please enter your lat and long like this: lat, long"
       input = gets.strip
       wifi_runner.latitude, wifi_runner.longitude = input.split(", ")
     end
 
-    def self.coords_wifi_finder(wifi_runner)
+    def coords_wifi_finder
       distance_hash = HotspotData.hotspots.each_with_object({}) do |wifi, h|
         distance = Geocoder::Calculations.distance_between( [wifi_runner.latitude, wifi_runner.longitude], [wifi.latitude, wifi.longitude] )
         h[wifi.name] = {distance: distance, id: wifi.id}
@@ -47,9 +68,9 @@ module Runner
       puts "#{name} located at #{hotspot.location.downcase.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }}, is #{distance.round(3)} miles away. When you arrive, you will see it in your list of available connections as '#{hotspot.ssid}'."
     end
 
-    def self.find_closest_wifi(wifi_runner)
-      self.coords_wifi_finder(wifi_runner)
-      self.display_wifi_distance( wifi_runner.closest_wifi)
+    def find_closest_wifi
+      coords_wifi_finder
+      self.class.display_wifi_distance( wifi_runner.closest_wifi)
     end
   end
 
@@ -67,20 +88,28 @@ module Runner
   end
 
   class Favorites
-    def self.favorite(wifi_runner)
+
+    attr_reader :user, :wifi_runner
+
+    def initialize(wifi_runner)
+      @wifi_runner = wifi_runner
+      @user = wifi_runner.user
+    end
+
+    def favorite
       {
-        user_id: wifi_runner.user.id,
+        user_id: user.id,
         wifi_location_id: wifi_runner.closest_wifi[:id]
       }
     end
 
-    def self.add_to_favorites(wifi_runner)
+    def add_to_favorites
       puts "Would you like to add this wifi location to your Favorites? (y/n)"
       input = ""
       while !(input == "y" || input == "n")
         input = gets.strip.downcase
         if input == "y"
-          add_favorites(wifi_runner)
+          add_favorites
         elsif input == "n"
           false
         else
@@ -89,16 +118,16 @@ module Runner
       end
     end
 
-    def self.add_favorites(wifi_runner)
-      Fav.find_or_create_by( favorite(wifi_runner) )
+    def add_favorites
+      Fav.find_or_create_by( favorite )
     end
 
-    def self.favorite?(wifi_runner)
-      !Fav.find_by( favorite(wifi_runner) )
+    def favorite?
+      !Fav.find_by( favorite )
     end
 
-    def self.display_favorites(wifi_runner)
-      favorites = wifi_runner.user.favs.map do |fav|
+    def display_favorites
+      favorites = User.find(user.id).favs.map do |fav|
         location = WifiLocation.find(fav.wifi_location_id)
         fav_wifi_info = {
           name: location.name,
@@ -112,6 +141,12 @@ module Runner
         Runner::Coordinates.display_wifi_distance(fav)
       end
     end
+
+    def delete_at(wifi_runner)
+      puts "Select favorite to delete by entering its corresponding number."
+
+    end
+
   end
 
 end

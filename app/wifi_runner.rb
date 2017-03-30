@@ -1,6 +1,6 @@
 class WifiRunner
   attr_accessor :latitude, :longitude, :input, :closest_wifi, :search_results
-  attr_reader :user
+  attr_reader :user, :coordinates, :favorites, :street_address
 
   def initialize
     puts "Please enter your name:"
@@ -9,7 +9,10 @@ class WifiRunner
     self.user.ip_address = `dig +short myip.opendns.com @resolver1.opendns.com`.chomp
     self.user.save
     puts "Welcome #{self.user.name}!"
-    Runner::IpAddress.set_coords_based_on_ip(self)
+    Runner::IpAddress.new(self).set_coords_based_on_ip
+    @coordinates = Runner::Coordinates.new(self)
+    @favorites = Runner::Favorites.new(self)
+    @street_address = Runner::StreetAddress.new(self)
   end
 
   def self.greeting
@@ -30,30 +33,36 @@ class WifiRunner
   end
 
   def by_coordinates
-    Runner::Coordinates.coords_prompt(self)
-    Runner::Coordinates.find_closest_wifi(self)
-    if Runner::Favorites.favorite?(self)
-      Runner::Favorites.add_to_favorites(self)
+    coordinates.coords_prompt
+    coordinates.find_closest_wifi
+    if favorites.favorite?
+      favorites.add_to_favorites
     end
   end
 
   def near_address
-    address = Runner::StreetAddress.prompt_address
-    Runner::StreetAddress.address_to_coords(address, self)
-    Runner::Coordinates.find_closest_wifi(self)
-    if Runner::Favorites.favorite?(self)
-      Runner::Favorites.add_to_favorites(self)
+    address = street_address.prompt_address
+    street_address.address_to_coords(address)
+    coordinates.find_closest_wifi
+    if favorites.favorite?
+      favorites.add_to_favorites
     end
   end
 
   def near_me
-    Runner::Coordinates.find_closest_wifi(self)
-    if Runner::Favorites.favorite?(self)
-      Runner::Favorites.add_to_favorites(self)
+    coordinates.find_closest_wifi
+    if favorites.favorite?
+      favorites.add_to_favorites
     end
   end
 
   def my_favorites
-    Runner::Favorites.display_favorites(self)
+    favorites.display_favorites
+  end
+
+  def delete_favorite
+    favorites.display_favorites
+    favorites.delete_at
+    favorites.display_favorites
   end
 end

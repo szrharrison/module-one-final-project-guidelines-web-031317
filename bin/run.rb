@@ -16,6 +16,8 @@ def run
       session.near_address
     when 'my favorites'
       session.my_favorites
+    when 'delete favorite'
+      session.delete_favorite
     end
   end
   puts 'Thank you for using WiFinder. Goodbye.'
