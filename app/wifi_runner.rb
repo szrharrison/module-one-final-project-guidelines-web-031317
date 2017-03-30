@@ -30,17 +30,20 @@ class WifiRunner
   def by_coordinates
     Runner::Coordinates.coords_prompt(self)
     Runner::Coordinates.find_closest_wifi(self)
+    # session.add_to_favorites
   end
 
   def near_address
     address = Runner::StreetAddress.prompt_address
     Runner::StreetAddress.address_to_coords(address, self)
     Runner::Coordinates.find_closest_wifi(self)
+    # session.add_to_favorites
   end
 
   def near_me
     Runner::IpAddress.set_coords_based_on_ip(self)
     Runner::Coordinates.find_closest_wifi(self)
+    Runner::Favorites.prompt_user(self)
   end
 
 end
