@@ -42,12 +42,12 @@ class WifiRunner
   end
 
   def self.help
-    puts 'near me         - nearest wifi to my current location'
-    puts 'near address    - nearest wifi to a given address'
-    puts 'by coordinates  - nearest wifi by location'
-    puts 'my favorites    - displays all of your favorites'
-    puts 'delete favorite - delete a favorite from your favorites'
-    puts 'quit            - exit the program'
+    puts 'near me           - nearest wifi to my current location'
+    puts 'near address      - nearest wifi to a given address'
+    puts 'near coordinates  - nearest wifi by location'
+    puts 'my favorites      - displays all of your favorites'
+    puts 'delete favorite   - delete a favorite from your favorites'
+    puts 'quit              - exit the program'
   end
 
   def prompt_user
@@ -55,7 +55,7 @@ class WifiRunner
     self.input = gets.strip
   end
 
-  def by_coordinates
+  def near_coordinates
     coordinates.coords_prompt
     coordinates.find_closest_wifi
     if favorites.favorite?

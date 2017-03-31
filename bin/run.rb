@@ -10,8 +10,8 @@ def run
       WifiRunner.help
     when 'near me'
       session.near_me
-    when 'by coordinates'
-      session.by_coordinates
+    when 'near coordinates'
+      session.near_coordinates
     when 'near address'
       session.near_address
     when 'my favorites'
