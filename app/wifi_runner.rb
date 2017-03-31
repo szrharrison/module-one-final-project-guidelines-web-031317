@@ -1,6 +1,6 @@
 class WifiRunner
   attr_accessor :latitude, :longitude, :input, :closest_wifi, :search_results
-  attr_reader :user, :coordinates, :favorites, :street_address
+  attr_reader :user, :coordinates, :favorites, :street_address, :details
 
   def initialize
     puts "Please enter your name:"
@@ -14,6 +14,7 @@ class WifiRunner
       @coordinates = Runner::Coordinates.new(self)
       @favorites = Runner::Favorites.new(self)
       @street_address = Runner::StreetAddress.new(self)
+      @details = Runner::Details.new(self)
     end
   end
 

@@ -104,16 +104,32 @@ module Runner
     end
 
     def add_to_favorites
-      puts "Would you like to add this wifi location to your Favorites? (y/n)"
+      puts "Would you like to add this wifi location to your Favorites or see more Details?
+      Type 'f' to add to Favorites, 'd' for more Details, or 'q' to return to the main menu
+      (f/d/q)"
       input = ""
-      while !(input == "y" || input == "n")
+      while !(input == "f" || input == "d" || input == "q")
         input = gets.strip.downcase
-        if input == "y"
+        if input == "d"
+          wifi_runner.details.display_details( wifi_runner.closest_wifi[:id] )
+          puts "Would you like to add this wifi location to your Favorites? (y/n)"
+          secondary_input = ""
+          while !(secondary_input == "y" || secondary_input == "n" )
+            secondary_input = gets.strip.downcase
+            if secondary_input == "y"
+              add_favorites
+            elsif secondary_input == "n"
+              false
+            else
+              puts "Please respond either 'y' or 'n'."
+            end
+          end
+        elsif input == "f"
           add_favorites
-        elsif input == "n"
+        elsif input == "q"
           false
         else
-          puts "Please respond either 'y' or 'n'."
+          puts "Please respond either 'f', 'd', or 'q'."
         end
       end
     end
@@ -151,6 +167,23 @@ module Runner
         Fav.find(id_to_delete).destroy
       elsif fav_to_delete != 'q'
         puts "That option was not found"
+      end
+    end
+  end
+
+  class Details
+    attr_reader :wifi_runner, :user, :wifi_location
+
+    def initialize( wifi_runner )
+      @wifi_runner = wifi_runner
+      @user = wifi_runner.user
+      @wifi_location = wifi_runner.closest_wifi
+    end
+
+    def display_details( location_id )
+      location = WifiLocation.find( location_id )
+      JSON.parse(location.to_json).each do |attributes, value|
+        puts "#{attributes}: #{value}"
       end
     end
   end
