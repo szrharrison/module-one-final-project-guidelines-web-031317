@@ -146,10 +146,12 @@ module Runner
     def delete_at
       puts "Select favorite to delete by entering its corresponding number."
       fav_to_delete = gets.strip
-      id_to_delete = favorites[fav_to_delete.to_i - 1][:favorite_id]
-      Fav.find(id_to_delete).destroy
+      if fav_to_delete != 'q' && fav_to_delete.to_i != 0 && fav_to_delete.to_i < favorites.length
+        id_to_delete = favorites[fav_to_delete.to_i - 1][:favorite_id]
+        Fav.find(id_to_delete).destroy
+      elsif fav_to_delete != 'q'
+        puts "That option was not found"
+      end
     end
-
   end
-
 end
