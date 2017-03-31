@@ -18,16 +18,25 @@ class WifiRunner
   end
 
   def self.greeting
-    2.times {self.intro_animation}
+    self.intro_animation
     puts 'Welcome to WiFinder'
   end
 
   def self.intro_animation
+    2.times do
+      i = 27
+      while i < 96
+        print "\033[2J"
+        File.foreach("ascii_animation/#{i}.rb") { |f| puts f }
+        sleep(0.03)
+        i += 1
+      end
+    end
     i = 27
-    while i < 96
+    while i < 65
+      print "\033[2J"
       File.foreach("ascii_animation/#{i}.rb") { |f| puts f }
       sleep(0.03)
-      print "\033[2J"
       i += 1
     end
   end
@@ -38,7 +47,6 @@ class WifiRunner
     puts 'by coordinates  - nearest wifi by location'
     puts 'my favorites    - displays all of your favorites'
     puts 'delete favorite - delete a favorite from your favorites'
-    puts 'play animation  - replay intro animation'
     puts 'quit            - exit the program'
   end
 

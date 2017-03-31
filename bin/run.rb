@@ -19,7 +19,7 @@ def run
     when 'delete favorite'
       session.delete_favorite
     when 'play animation'
-      2.times {WifiRunner.intro_animation}
+      WifiRunner.intro_animation
     end
   end
   puts 'Thank you for using WiFinder. Goodbye.'
