@@ -145,7 +145,7 @@ module Runner
 
     def delete_at
       puts "Select favorite to delete by entering its corresponding number."
-      fav_to_delete = gets.chomp
+      fav_to_delete = gets.strip
       id_to_delete = favorites[fav_to_delete.to_i - 1][:favorite_id]
       Fav.find(id_to_delete).destroy
     end

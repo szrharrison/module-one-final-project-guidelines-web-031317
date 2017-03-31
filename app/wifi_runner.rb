@@ -4,27 +4,32 @@ class WifiRunner
 
   def initialize
     puts "Please enter your name:"
-    input = gets.strip
-    @user = User.find_or_initialize_by(name: input)
-    self.user.ip_address = `dig +short myip opendns com @resolver1 opendns com`.chomp
-    self.user.save
-    puts "Welcome #{self.user.name}!"
-    Runner::IpAddress.new(self).set_coords_based_on_ip
-    @coordinates = Runner::Coordinates.new(self)
-    @favorites = Runner::Favorites.new(self)
-    @street_address = Runner::StreetAddress.new(self)
+    self.input = gets.strip
+    unless self.input == 'quit'
+      @user = User.find_or_initialize_by(name: input)
+      self.user.ip_address = `dig +short myip.opendns.com @resolver1.opendns.com`.strip
+      self.user.save
+      puts "Welcome #{self.user.name}!"
+      Runner::IpAddress.new(self).set_coords_based_on_ip
+      @coordinates = Runner::Coordinates.new(self)
+      @favorites = Runner::Favorites.new(self)
+      @street_address = Runner::StreetAddress.new(self)
+    end
   end
 
   def self.greeting
-    i = 1
-    while i < 70
-      file = File.open("ascii_animation/#{i}.rb")
-      file.read
-      print "\033[2J"
+    2.times {self.intro_animation}
+    puts 'Welcome to WiFinder'
+  end
+
+  def self.intro_animation
+    i = 27
+    while i < 96
+      File.foreach("ascii_animation/#{i}.rb") { |f| puts f }
       sleep(0.03)
+      print "\033[2J"
       i += 1
     end
-    puts 'Welcome to WiFinder'
   end
 
   def self.help
@@ -32,6 +37,8 @@ class WifiRunner
     puts 'near address    - nearest wifi to a given address'
     puts 'by coordinates  - nearest wifi by location'
     puts 'my favorites    - displays all of your favorites'
+    puts 'delete favorite - delete a favorite from your favorites'
+    puts 'play animation  - replay intro animation'
     puts 'quit            - exit the program'
   end
 
